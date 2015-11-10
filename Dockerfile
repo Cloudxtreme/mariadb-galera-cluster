@@ -18,4 +18,3 @@ COPY docker-entrypoint.sh /entrypoint.sh
 ENTRYPOINT ["/entrypoint.sh"]
 
 EXPOSE 3306 4567
-CMD ["mysqld"]
