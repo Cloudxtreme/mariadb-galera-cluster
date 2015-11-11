@@ -1,4 +1,16 @@
 [mysqld]
+## General
+user=mysql
+datadir=/var/lib/mysql
+#
+### InnoDB configuration
+innodb_buffer_pool_size=1G
+innodb_log_file_size=64M
+innodb_flush_method=O_DIRECT
+innodb_locks_unsafe_for_binlog
+innodb_autoinc_lock_mode=2
+innodb_file_per_table
+log-error = /var/log/mysql.error
 query_cache_size=0
 binlog_format=ROW
 default-storage-engine=innodb
