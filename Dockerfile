@@ -14,6 +14,7 @@ RUN rpm --import https://yum.mariadb.org/RPM-GPG-KEY-MariaDB \
 VOLUME /var/lib/mysql /etc/my.cnf.d/
 
 COPY server.cnf /etc/my.cnf.d/server.cnf
+COPY iptables /etc/sysconfig/iptables
 COPY docker-entrypoint.sh /entrypoint.sh
 
 ENTRYPOINT ["/entrypoint.sh"]
