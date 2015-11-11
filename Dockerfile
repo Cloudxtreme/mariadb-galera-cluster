@@ -7,8 +7,8 @@ RUN groupadd -r mysql && useradd -r -g mysql mysql
 
 RUN rpm --import https://yum.mariadb.org/RPM-GPG-KEY-MariaDB \
     && yum update -y \
-    && yum -y http://www.percona.com/downloads/percona-release/redhat/0.1-3/percona-release-0.1-3.noarch.rpm \
-    && yum -y which net-tools rsync hostname bind-utils \
+    && yum -y install http://www.percona.com/downloads/percona-release/redhat/0.1-3/percona-release-0.1-3.noarch.rpm \
+    && yum -y install which net-tools rsync hostname bind-utils \
     && yum --enablerepo=mariadb -y install MariaDB-Galera-server MariaDB-client galera percona-xtrabackup.x86_64
     
 VOLUME /var/lib/mysql /etc/my.cnf.d/
