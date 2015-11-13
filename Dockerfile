@@ -15,9 +15,9 @@ RUN rpm --import https://yum.mariadb.org/RPM-GPG-KEY-MariaDB \
 
 RUN /sbin/chkconfig mysql on
 RUN /sbin/chkconfig sendmail on
-RUN mkdir -p /root/scripts
+RUN mkdir /root/scripts
 
-VOLUME /var/lib/mysql /etc/my.cnf.d/
+VOLUME /var/lib/mysql /etc/my.cnf.d/ 
 
 COPY galera_monitor /root/scripts/galera_monitor
 COPY server.cnf /etc/my.cnf.d/server.cnf
