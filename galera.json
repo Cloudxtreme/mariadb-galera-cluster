@@ -3,23 +3,27 @@
     "application": {
         "name": "MariaDB Galera Cluster (Docker)",
         "id": "mariadb-galera",
-        "logo": "http://jps.layershift.com/mariadbgalera/mariadb.png",
         "homepage": "https://mariadb.com/",
+        "logo": "http://jps.layershift.com/mariadbgalera/mariadb.png",
         "type": "docker",
         "version": "10.0",
-        "description": "MariaDB Galera Cluster is a synchronous multi-master cluster for MariaDB. It is available on Linux only, and only supports the XtraDB/InnoDB storage engines.",
+        "description": "MariaDB Galera Cluster is a synchronous multi-master cluster for MariaDB. It is available on Linux only, and only supports the XtraDB/InnoDB storage engines. <br />This installation consists of three MariaDB cluster members in Docker containers.",
         "settings": {
             "fields": [{
                     "type": "string",
                     "name": "root_pwd",
                     "caption": "Root password",
-                    "default": "secureP455w0rD",
+                    "vtype": "alphanum",
+                    "vtypeText": "Alphanumeric input only.",
+                    "placeholder": "MariaDB root password",
                     "required": true
                 }, {
                     "type": "string",
                     "name": "galera_pwd",
                     "caption": "Replication pass",
-                    "default": "replicationP455w0rD",
+                    "vtype": "alphanum",
+                    "vtypeText": "Alphanumeric input only.",
+                    "placeholder": "Galera replication password",
                     "required": true
                 }
             ]
@@ -34,16 +38,16 @@
                         "displayName": "MariaDB Galera Cluster",
                         "docker": {
                             "nodeMission": "sqldb",
-                            "image": "layershift/mariadb-galera:latest",
+                            "image": "bbania/mariadb-galera-cluster:latest",
                             "env": {
                                 "MYSQL_ROOT_PASSWORD": "${settings.root_pwd}",
                                 "LANG": "en_US.utf8",
                                 "PATH": "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
-                            }, 
+                            },
                             "volumes": [
-                                "/var/lib/mysql",
-                                "/etc/my.cnf",
-                                "/etc/my.cnf.d"
+                                    "/var/lib/mysql",
+                                    "/etc/my.cnf",
+                                    "/etc/my.cnf.d"
                             ]
                         }
                     }
@@ -54,6 +58,7 @@
             "call": [
                     "preconfigureMariaDB",
                     "configureNodes",
+                    "configureSendmail",
                     "startNode0",
                     "startNode1",
                     "startNode2",
@@ -116,7 +121,22 @@
                         ]
                     }
                 ]
-            }, { 
+            }, {
+                "id": "configureSendmail",
+                "onCall": [{
+                        "executeShellCommands": [{
+                                "nodeMission": "sqldb",
+                                "user": "root",
+                                "commands": [
+                                        "sed -i \"s/1m/5s/g\" /etc/mail/sendmail.mc",
+                                        "m4 /etc/mail/sendmail.mc > /etc/mail/sendmail.cf",
+                                        "service sendmail restart"
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }, {
                 "id": "startNode0",
                 "onCall": [{
                         "executeShellCommands": [{
@@ -129,7 +149,7 @@
                         ]
                     }
                 ]
-            }, { 
+            }, {
                 "id": "startNode1",
                 "onCall": [{
                         "executeShellCommands": [{
@@ -142,7 +162,7 @@
                         ]
                     }
                 ]
-            }, { 
+            }, {
                 "id": "startNode2",
                 "onCall": [{
                         "executeShellCommands": [{
@@ -155,11 +175,11 @@
                         ]
                     }
                 ]
-            }, { 
+            }, {
                 "id": "restartMarias",
                 "onCall": [{
                         "restartContainers": {
-                                "nodeMission": "sqldb"
+                            "nodeMission": "sqldb"
                         }
                     }
                 ]
@@ -171,4 +191,3 @@
         }
     }
 }
-
