@@ -13,7 +13,6 @@ RUN rpm --import https://yum.mariadb.org/RPM-GPG-KEY-MariaDB \
     && yum -y install m4 mailx sendmail sendmail-cf \
     && yum clean all
 
-RUN useradd -r -g smmsp smmsp
 RUN chown -R smmsp:smmsp /var/spool/clientmailqueue
 RUN /sbin/chkconfig mysql on
 RUN /sbin/chkconfig sendmail on
