@@ -1,0 +1,23 @@
+#!/bin/bash
+## Monitor galera cluster size
+ 
+## Where the alert should be sent to
+EMAIL="SENDTO"
+
+cluster_size=`mysql -e "show status like 'wsrep_cluster_size'" | tail -1 | awk {'print $2'}`
+hostname=`hostname`
+error=`tail -100 /var/log/mysql.log`
+ 
+SUBJECT1="ERROR: [$hostname] Galera Cluster Size"
+SUBJECT2="WARNING: [$hostname] Galera Cluster Size"
+EMAILMESSAGE="/tmp/emailmessage.txt"
+ 
+echo "Cluster size result: $cluster_size" > $EMAILMESSAGE
+echo "Latest error: $error" >> $EMAILMESSAGE
+ 
+if [ $cluster_size -eq 1 ]; then
+    /bin/mail -s "$SUBJECT1" "$EMAIL" < $EMAILMESSAGE
+    /etc/init.d/mysql stop                    # stop the mysql server to prevent split-brain
+elif [ $cluster_size -eq 2 ]; then
+    /bin/mail -s "$SUBJECT2" "$EMAIL" < $EMAILMESSAGE
+fi
