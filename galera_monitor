@@ -1,25 +1,31 @@
 #!/bin/bash
 ## Monitor galera cluster size
- 
+
 ## Where the alert should be sent to
 EMAIL="SENDTO"
 
-cluster_status=`mysql -e "show status like 'wsrep_cluster_status'" | tail -1 | awk {'print $2'}`
-cluster_size=`mysql -e "show status like 'wsrep_cluster_size'" | tail -1 | awk {'print $2'}`
+mysql_status=`service mysql status|awk {'print $1'}`
 hostname=`hostname`
 error=`tail -100 /var/log/mysql.log`
- 
-SUBJECT1="ERROR: [$hostname] Galera Cluster Size"
-SUBJECT2="WARNING: [$hostname] Galera Cluster Size"
+
+SUBJECT1="ERROR: [$hostname] Galera Cluster Size is wrong!"
+SUBJECT2="WARNING: [$hostname] Galera Cluster Size is wrong!"
+SUBJECT3="DISASTER: [$hostname] Galera Cluster not running!"
 EMAILMESSAGE="/tmp/emailmessage.txt"
- 
+
 echo "Cluster size result: $cluster_size" > $EMAILMESSAGE
 echo "Latest error: $error" >> $EMAILMESSAGE
 
-if [ $cluster_size -eq 1 ]; then
-  /bin/mail -s "$SUBJECT1" "$EMAIL" < $EMAILMESSAGE
-  /etc/init.d/mysql stop                    # stop the mysql server to prevent split-brain
-elif [ $cluster_size -eq 2 ]; then
-  /bin/mail -s "$SUBJECT2" "$EMAIL" < $EMAILMESSAGE
+if [ $mysql_status == "SUCCESS!" ]; then
+  cluster_size=`mysql -e "show status like 'wsrep_cluster_size'" | tail -1 | awk {'print $2'}`
+  if [ $cluster_size -eq 1 ]; then
+    /bin/mail -s "$SUBJECT1" "$EMAIL" < $EMAILMESSAGE
+    /etc/init.d/mysql stop                    # stop the mysql server to prevent split-brain
+  elif [ $cluster_size -eq 2 ]; then
+    /bin/mail -s "$SUBJECT2" "$EMAIL" < $EMAILMESSAGE
+  fi
+elif [ $mysql_status == "ERROR!" ]; then
+  echo "Latest error: $error" > $EMAILMESSAGE
+  /bin/mail -s "$SUBJECT3" "$EMAIL" < $EMAILMESSAGE
 fi
 
