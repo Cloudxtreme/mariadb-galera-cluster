@@ -16,13 +16,10 @@ EMAILMESSAGE="/tmp/emailmessage.txt"
 echo "Cluster size result: $cluster_size" > $EMAILMESSAGE
 echo "Latest error: $error" >> $EMAILMESSAGE
 
-if [ $cluster_status == 'Primary' ]; then
-    if [ $cluster_size -eq 1 ]; then
-        /bin/mail -s "$SUBJECT1" "$EMAIL" < $EMAILMESSAGE
-        /etc/init.d/mysql stop                    # stop the mysql server to prevent split-brain
-    elif [ $cluster_size -eq 2 ]; then
-        /bin/mail -s "$SUBJECT2" "$EMAIL" < $EMAILMESSAGE
-    fi
-else
-    break
+if [ $cluster_size -eq 1 ]; then
+  /bin/mail -s "$SUBJECT1" "$EMAIL" < $EMAILMESSAGE
+  /etc/init.d/mysql stop                    # stop the mysql server to prevent split-brain
+elif [ $cluster_size -eq 2 ]; then
+  /bin/mail -s "$SUBJECT2" "$EMAIL" < $EMAILMESSAGE
 fi
+
