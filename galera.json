@@ -130,6 +130,15 @@
                                 "commands": [
                                         "sed -i \"s/1m/5s/g\" /etc/mail/sendmail.mc",
                                         "m4 /etc/mail/sendmail.mc > /etc/mail/sendmail.cf",
+                                        "mkdir /root/scripts",
+                                        "sed -i \"s/SENDTO/${user.email}/g\" /root/scripts/galera_monitor",
+                                        "echo \"*/5 * * * * /bin/sh /root/scripts/galera_monitor\" >> /var/spool/cron/root",
+                                        "echo \"[client]\" > /root/.my.cnf",
+                                        "echo \"user=galerareplicator\" >> /root/.my.cnf",
+                                        "echo \"password=${settings.galera_pwd}\" >> /root/.my.cnf",
+                                        "chmod 400 /root/.my.cnf",
+                                        "chmod +x /root/scripts/galera_monitor",
+                                        "chkconfig sendmail on",
                                         "service sendmail restart"
                                 ]
                             }
