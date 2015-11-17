@@ -4,7 +4,9 @@
 ## Where the alert should be sent to
 EMAIL="SENDTO"
 
+## Check if MariaDB is running
 mysql_status=`service mysql status|awk {'print $1'}`
+
 hostname=`hostname`
 error=`tail -100 /var/log/mysql.log`
 
@@ -12,9 +14,11 @@ SUBJECT1="ERROR: [$hostname] Galera Cluster Size is wrong!"
 SUBJECT2="WARNING: [$hostname] Galera Cluster Size is wrong!"
 SUBJECT3="DISASTER: [$hostname] Galera Cluster not running!"
 CLUSTER1="DISASTER: [$hostname] Galera cluster lost quorum! Please inspect the service!"
+
 EMAILMESSAGE="/tmp/emailmessage.txt"
 
 if [ $mysql_status == "SUCCESS!" ]; then
+## Monitor cluster size state
   cluster_size=`mysql -e "show status like 'wsrep_cluster_size'" | tail -1 | awk {'print $2'}`
   if [ $cluster_size -eq 1 ]; then
     echo "Cluster size: $cluster_size" > $EMAILMESSAGE
@@ -29,6 +33,7 @@ if [ $mysql_status == "SUCCESS!" ]; then
     echo "Latest error: $error" >> $EMAILMESSAGE
     /bin/mail -s "$SUBJECT2" "$EMAIL" < $EMAILMESSAGE
   fi
+## Monitor cluster status
   cluster_status=`mysql -e "show status like 'wsrep_cluster_status'" | tail -1 | awk {'print $2'}`
   if [ $cluster_status != "Primary"]; then
     echo "Please start here: http://galeracluster.com/documentation-webpages/quorumreset.html" > $EMAILMESSAGE
