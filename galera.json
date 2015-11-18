@@ -38,7 +38,7 @@
                         "displayName": "MariaDB Galera Cluster",
                         "docker": {
                             "nodeMission": "sqldb",
-                            "image": "bbania/mariadb-galera-cluster:latest",
+                            "image": "bbania/mariadb-galera-cluster:master",
                             "env": {
                                 "MYSQL_ROOT_PASSWORD": "${settings.root_pwd}",
                                 "LANG": "en_US.utf8",
