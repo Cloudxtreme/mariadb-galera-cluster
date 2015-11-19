@@ -19,7 +19,7 @@ RUN mkdir /root/scripts
 
 VOLUME /var/lib/mysql /etc/my.cnf.d/ 
 
-COPY galera_monitor /root/scripts/galera_monitor
+COPY galeramonitor /root/scripts/galera_monitor
 COPY server.cnf /etc/my.cnf.d/server.cnf
 COPY iptables /etc/sysconfig/iptables
 COPY user.sql /tmp/user.sql
