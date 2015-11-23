@@ -25,6 +25,13 @@
                     "vtypeText": "Alphanumeric input only.",
                     "placeholder": "Galera replication password",
                     "required": true
+                }, {
+                    "type": "string",
+                    "name": "notified",
+                    "caption": "Monitor email",
+                    "default": "${user.email}",
+                    "placeholder": "Email address for error notifications.",
+                    "required": true
                 }
             ]
         },
@@ -38,7 +45,7 @@
                         "displayName": "MariaDB Galera Cluster",
                         "docker": {
                             "nodeMission": "sqldb",
-                            "image": "bbania/mariadb-galera-cluster:master",
+                            "image": "layershift/mariadb-galera:latest",
                             "env": {
                                 "MYSQL_ROOT_PASSWORD": "${settings.root_pwd}",
                                 "LANG": "en_US.utf8",
@@ -62,7 +69,8 @@
                     "startNode0",
                     "startNode1",
                     "startNode2",
-                    "restartMarias"
+                    "restartMarias",
+                    "addCrontask"
             ]
         },
         "procedures": [{
@@ -130,9 +138,8 @@
                                 "commands": [
                                         "sed -i \"s/1m/5s/g\" /etc/mail/sendmail.mc",
                                         "m4 /etc/mail/sendmail.mc > /etc/mail/sendmail.cf",
-                                        "mkdir /root/scripts",
-                                        "sed -i \"s/SENDTO/${user.email}/g\" /root/scripts/galera_monitor",
-                                        "echo \"*/5 * * * * /bin/sh /root/scripts/galera_monitor\" >> /var/spool/cron/root",
+                                        "wget -q -O /root/scripts/galera_monitor http://jps.layershift.com/mariadbgalera/galeramonitor",
+                                        "sed -i \"s/SENDTO/${settings.notified}/g\" /root/scripts/galera_monitor",
                                         "echo \"[client]\" > /root/.my.cnf",
                                         "echo \"user=galerareplicator\" >> /root/.my.cnf",
                                         "echo \"password=${settings.galera_pwd}\" >> /root/.my.cnf",
@@ -190,6 +197,19 @@
                         "restartContainers": {
                             "nodeMission": "sqldb"
                         }
+                    }
+                ]
+            }, {
+                "id": "addCrontask",
+                "onCall": [{
+                        "executeShellCommands": [{
+                                "nodeMission": "sqldb",
+                                "user": "root",
+                                "commands": [
+                                        "echo \"*/5 * * * * /bin/sh /root/scripts/galera_monitor >/dev/null 2>&1\" >> /var/spool/cron/root"
+                                ]
+                            }
+                        ]
                     }
                 ]
             }
