@@ -138,7 +138,6 @@
                                 "commands": [
                                         "sed -i \"s/1m/5s/g\" /etc/mail/sendmail.mc",
                                         "m4 /etc/mail/sendmail.mc > /etc/mail/sendmail.cf",
-                                        "wget -q -O /root/scripts/galera_monitor http://jps.layershift.com/mariadbgalera/galeramonitor",
                                         "sed -i \"s/SENDTO/${settings.notified}/g\" /root/scripts/galera_monitor",
                                         "echo \"[client]\" > /root/.my.cnf",
                                         "echo \"user=galerareplicator\" >> /root/.my.cnf",
@@ -206,7 +205,7 @@
                                 "nodeMission": "sqldb",
                                 "user": "root",
                                 "commands": [
-                                        "echo \"*/5 * * * * /bin/sh /root/scripts/galera_monitor >/dev/null 2>&1\" >> /var/spool/cron/root"
+                                        "sed -i \"/#/d\" /var/spool/cron/root"
                                 ]
                             }
                         ]
@@ -220,3 +219,4 @@
         }
     }
 }
+
