@@ -1,7 +1,7 @@
 FROM bbania/centos:galera
 MAINTAINER "Bart Bania" <contact@bartbania.com> 
 
-RUN groupadd -r mysql && useradd -r -g mysql mysql
+RUN useradd -r -g mysql mysql
 
 RUN /sbin/chkconfig mysql on
 RUN /sbin/chkconfig sendmail on
