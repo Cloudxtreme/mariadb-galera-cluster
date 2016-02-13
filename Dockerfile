@@ -4,7 +4,6 @@ MAINTAINER "Bart Bania" <contact@bartbania.com>
 VOLUME /var/lib/mysql /etc/my.cnf.d/ /root/ /var/spool/cron/
 
 RUN /sbin/chkconfig mysql on && /sbin/chkconfig sendmail on
-
 RUN mkdir /root/scripts
 
 COPY ./checker ./galeramonitor /root/scripts/
