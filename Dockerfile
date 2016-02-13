@@ -1,16 +1,13 @@
 FROM bbania/centos:galera
 MAINTAINER "Bart Bania" <contact@bartbania.com> 
 
-RUN useradd -r -g mysql mysql
+VOLUME /var/lib/mysql /etc/my.cnf.d/ /root/ /var/spool/cron/
 
 RUN /sbin/chkconfig mysql on
 RUN /sbin/chkconfig sendmail on
 RUN mkdir /root/scripts
 
-VOLUME /var/lib/mysql /etc/my.cnf.d/ /root/ /var/spool/cron/
-
-COPY galeramonitor /root/scripts/galera_monitor
-COPY checker /root/scripts/checker
+COPY checker galeramonitor /root/scripts/
 COPY server.cnf /etc/my.cnf.d/server.cnf
 COPY iptables /etc/sysconfig/iptables
 COPY user.sql /tmp/user.sql
